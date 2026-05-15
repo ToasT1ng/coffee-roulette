@@ -40,40 +40,36 @@
   gap: 12px;
 }
 
-.race-player-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+.race-player-card {
+  position: relative;
+  background: #f0ebe1;
+  border-radius: 14px;
+  padding: 10px 12px;
+  width: 100%;
 }
 
-.player-dot {
-  width: 14px;
-  height: 14px;
+.remove-btn {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  background: #c8a882;
+  color: #fff;
+  font-size: 11px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.player-input {
-  flex: 1;
-  min-width: 80px;
-  border: 1.5px solid #e8d5c0;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 16px;
-  font-family: inherit;
-  background: #fff;
-  color: #3b2314;
-  outline: none;
-}
-
-.player-input:focus {
-  border-color: #c8a882;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
 }
 
 .char-picker {
   display: flex;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
 }
 
 .char-btn {
@@ -90,14 +86,13 @@
   background: #fff3ee;
 }
 
-.remove-btn {
-  background: none;
-  color: #ccc;
-  font-size: 18px;
-  padding: 4px 6px;
+.char-btn.taken {
+  opacity: 0.25;
+  cursor: not-allowed;
 }
 
 .add-btn {
+  width: 100%;
   background: none;
   border: 1.5px dashed #c8a882;
   color: #9a7558;
@@ -108,6 +103,7 @@
 }
 
 .start-btn {
+  width: 100%;
   background: #1a1a2e;
   color: #fff;
   border-radius: 16px;
