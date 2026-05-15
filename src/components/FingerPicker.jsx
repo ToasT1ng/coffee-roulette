@@ -77,8 +77,8 @@ export default function FingerPicker({ onBack }) {
   }, [phase, touches, startCountdown])
 
   const handleTouchEnd = useCallback((e) => {
-    e.preventDefault()
     if (phase === 'result' || phase === 'countdown') return
+    e.preventDefault()
 
     clearTimeout(holdTimer.current)
     const newTouches = { ...touches }
