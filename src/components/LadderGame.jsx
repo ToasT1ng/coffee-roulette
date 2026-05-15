@@ -15,7 +15,7 @@ const CHAR_COLORS = {
 const MAX_PLAYERS = 8
 const RUNG_CHANCE = 0.45
 const ROWS = 14
-const ANIM_SPEED = 0.0033
+const ANIM_SPEED = 0.00238
 
 function buildLadder(n) {
   const rungs = Array.from({ length: ROWS }, () => Array(n - 1).fill(false))
@@ -188,7 +188,7 @@ export default function LadderGame({ onBack }) {
     const timer = setTimeout(() => {
       progressRef.current = 0
       setPhase('animating')
-    }, 750)
+    }, 2000)
     return () => clearTimeout(timer)
   }, [phase, draw])
 
@@ -261,6 +261,12 @@ export default function LadderGame({ onBack }) {
       {(phase === 'playing' || phase === 'animating' || phase === 'done') && (
         <div className="ladder-play">
           <canvas ref={canvasRef} className="ladder-canvas" width={360} height={500} />
+
+          {phase === 'playing' && (
+            <div className="ladder-start-overlay">
+              <p className="ladder-start-text">Game Start!</p>
+            </div>
+          )}
 
           {phase === 'done' && loser !== null && loser >= 0 && (
             <div className="ladder-overlay" onClick={reset}>
