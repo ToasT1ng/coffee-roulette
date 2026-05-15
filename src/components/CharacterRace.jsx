@@ -73,10 +73,7 @@ export default function CharacterRace({ onBack }) {
         }
       }
     }
-    ctx.fillStyle = 'rgba(255,255,255,0.5)'
-    ctx.font = 'bold 9px system-ui'
-    ctx.textAlign = 'center'
-    ctx.fillText('FINISH', FINISH_X + sq, 10)
+
 
     players.forEach((pl, i) => {
       const st = states[i]

@@ -78,7 +78,7 @@
   border-radius: 12px;
   padding: 5px 0;
   font-size: 26px;
-  border: 2px inset transparent;
+  border: 2px solid transparent;
   transition: border-color 0.1s;
   display: flex;
   align-items: center;
