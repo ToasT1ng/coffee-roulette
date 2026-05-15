@@ -101,15 +101,18 @@ export default function FingerPicker({ onBack }) {
   }, [phase])
 
   const handleTouchEnd = useCallback((e) => {
-    if (phase === 'result' || phase === 'countdown') return
+    if (phase === 'result') return
     e.preventDefault()
 
     clearTimeout(holdTimer.current)
+    clearInterval(countdownTimer.current)
+
     const newTouches = { ...touches }
     Array.from(e.changedTouches).forEach(t => {
       delete newTouches[t.identifier]
     })
     setTouches(newTouches)
+    if (phase === 'countdown') setPhase('waiting')
   }, [phase, touches])
 
   const handleMouseMove = useCallback((e) => {
@@ -154,12 +157,15 @@ export default function FingerPicker({ onBack }) {
   const handleMouseUp = useCallback((e) => {
     mouseDownRef.current = false
     if (e.target.tagName === 'BUTTON') return
-    if (phase === 'result' || phase === 'countdown') return
+    if (phase === 'result') return
 
     clearTimeout(holdTimer.current)
+    clearInterval(countdownTimer.current)
+
     const newTouches = { ...touches }
     delete newTouches['mouse']
     setTouches(newTouches)
+    if (phase === 'countdown') setPhase('waiting')
   }, [phase, touches])
 
   useEffect(() => () => {
