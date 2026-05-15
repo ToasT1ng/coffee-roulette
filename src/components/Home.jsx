@@ -1,18 +1,19 @@
 import './Home.css'
 
 const GAMES = [
-  { id: 'finger', emoji: '☕', label: '터치 추첨' },
+  { id: 'finger', emoji: '✋', label: '터치 추첨' },
   { id: 'ladder', emoji: '🪜', label: '사다리 게임' },
   { id: 'race', emoji: '🏁', label: '꼴찌 정하기' },
+  { id: 'pinball', emoji: '🎱', label: '핀볼' },
 ]
 
 export default function Home({ onSelect }) {
   return (
     <div className="home">
       <div className="home-header">
-        <div className="home-logo">☕</div>
-        <h1>오늘은 누가</h1>
-        <p>(일단나는아님)</p>
+        <div className="home-logo">🎲</div>
+        <h1>누가 쏠래</h1>
+        <p>(일단난아님)</p>
       </div>
       <div className="home-games">
         {GAMES.map(g => (

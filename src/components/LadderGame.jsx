@@ -64,6 +64,7 @@ export default function LadderGame({ onBack }) {
   const canvasRef = useRef()
   const animRef = useRef()
   const progressRef = useRef(0)
+  const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1
 
   const n = players.length
   const loser = phase === 'done' && results
@@ -97,9 +98,10 @@ export default function LadderGame({ onBack }) {
   const draw = useCallback((t) => {
     const canvas = canvasRef.current
     if (!canvas || !ladder || !results) return
-    const W = canvas.width
-    const H = canvas.height
     const ctx = canvas.getContext('2d')
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    const W = canvas.width / dpr
+    const H = canvas.height / dpr
     ctx.clearRect(0, 0, W, H)
 
     const PAD_X = 28
@@ -260,7 +262,7 @@ export default function LadderGame({ onBack }) {
 
       {(phase === 'playing' || phase === 'animating' || phase === 'done') && (
         <div className="ladder-play">
-          <canvas ref={canvasRef} className="ladder-canvas" width={360} height={500} />
+          <canvas ref={canvasRef} className="ladder-canvas" width={360 * dpr} height={500 * dpr} style={{ width: 360, height: 500 }} />
 
           {phase === 'playing' && (
             <div className="ladder-start-overlay">

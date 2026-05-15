@@ -1,0 +1,272 @@
+.pinball-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fefcf8;
+}
+
+.pinball-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #1a1a2e;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.pinball-setup {
+  flex: 1;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  overflow-y: auto;
+}
+
+.setup-hint {
+  color: #9a7558;
+  font-size: 14px;
+  text-align: center;
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pinball-player-card {
+  position: relative;
+  background: #f0ebe1;
+  border-radius: 18px;
+  padding: 14px 16px;
+  width: 100%;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  background: #c8a882;
+  color: #fff;
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+.char-picker {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.char-btn {
+  flex: 1;
+  background: #fefcf8;
+  border-radius: 12px;
+  padding: 5px 0;
+  font-size: 26px;
+  border: 2.5px solid transparent;
+  transition: border-color 0.1s;
+  text-align: center;
+}
+
+.char-btn.selected {
+  border-color: #6f4e37;
+  background: #fff8f3;
+}
+
+.char-btn.taken {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.add-btn {
+  width: 100%;
+  background: none;
+  border: 2px dashed #c8a882;
+  color: #9a7558;
+  border-radius: 16px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.start-btn {
+  width: 100%;
+  background: #1a1a2e;
+  color: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.ball-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0ebe1;
+  border-radius: 18px;
+  padding: 14px 20px;
+}
+
+.ball-count-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #6f4e37;
+}
+
+.ball-count-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ball-count-ctrl button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6f4e37;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.ball-count-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: #3b2314;
+  min-width: 28px;
+  text-align: center;
+}
+
+.pinball-play {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #1a1a2e;
+}
+
+.pinball-canvas {
+  display: block;
+  background: #1a1a2e;
+}
+
+.pinball-counts {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  flex-wrap: wrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.pinball-count-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 20px;
+  padding: 4px 10px 4px 7px;
+  transition: opacity 0.3s;
+}
+
+.pinball-count-item.eliminated {
+  opacity: 0.3;
+}
+
+.count-char {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.count-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  min-width: 10px;
+  text-align: center;
+}
+
+.pinball-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 8, 20, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  animation: overlay-in 0.3s ease;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pinball-verdict {
+  position: relative;
+  display: inline-block;
+}
+
+.verdict-char {
+  font-size: 80px;
+  display: block;
+  animation: verdict-pop 0.4s ease;
+}
+
+.verdict-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -16px;
+  font-size: 36px;
+  animation: verdict-pop 0.3s ease 0.2s both;
+}
+
+@keyframes verdict-pop {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.verdict-text {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  margin: 4px 0 0;
+}
+
+.verdict-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 16px;
+}
