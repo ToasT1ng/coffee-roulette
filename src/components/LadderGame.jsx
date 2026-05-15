@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import './LadderGame.css'
 
-const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
+const CHARACTERS = ['🐮','🐷','🦊','🐻','🐼','🐨','🐱','🐶']
 const CHAR_COLORS = {
-  '🐢': '#3dba6f',
-  '🐇': '#f0ece4',
+  '🐮': '#ffffff',
+  '🐷': '#ff9eb5',
   '🦊': '#e8733a',
   '🐻': '#8b5e3c',
   '🐼': '#b0b0b0',
@@ -56,7 +56,7 @@ function pathPos(path, t, cx, getY) {
 }
 
 export default function LadderGame({ onBack }) {
-  const [players, setPlayers] = useState([{ char: '🐢' }, { char: '🐇' }, { char: '🦊' }])
+  const [players, setPlayers] = useState([{ char: '🐮' }, { char: '🐷' }, { char: '🦊' }])
   const [phase, setPhase] = useState('setup')
   const [ladder, setLadder] = useState(null)
   const [results, setResults] = useState(null)

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import './CharacterRace.css'
 
-const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
+const CHARACTERS = ['🐮','🐷','🦊','🐻','🐼','🐨','🐱','🐶']
 const MAX_PLAYERS = 8
 const BASE_SPEED = 0.00022
 const BOOST_CHANCE = 0.01
@@ -11,8 +11,8 @@ const DRAMA_ZONE = 0.80
 
 export default function CharacterRace({ onBack }) {
   const [players, setPlayers] = useState([
-    { char: '🐢' },
-    { char: '🐇' },
+    { char: '🐮' },
+    { char: '🐷' },
   ])
   const [phase, setPhase] = useState('setup')
   const [loser, setLoser] = useState(null)
@@ -73,10 +73,7 @@ export default function CharacterRace({ onBack }) {
         }
       }
     }
-    ctx.fillStyle = 'rgba(255,255,255,0.5)'
-    ctx.font = 'bold 9px system-ui'
-    ctx.textAlign = 'center'
-    ctx.fillText('FINISH', FINISH_X + sq, 10)
+
 
     players.forEach((pl, i) => {
       const st = states[i]

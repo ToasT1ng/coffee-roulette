@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react'
 import './PinballGame.css'
 
-const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
+const CHARACTERS = ['🐮','🐷','🦊','🐻','🐼','🐨','🐱','🐶']
 const MAX_PLAYERS = 8
 const GRAVITY = 0.178
 const DAMPING = 0.62
@@ -23,7 +23,7 @@ const PADDLES = [
 ]
 
 const CHAR_RADIUS = {
-  '🐢': 12, '🐇': 12, '🦊': 12, '🐻': 12,
+  '🐮': 12, '🐷': 12, '🦊': 12, '🐻': 12,
   '🐼': 12, '🐨': 12, '🐱': 12, '🐶': 12,
 }
 
@@ -142,7 +142,7 @@ function resolveBallPair(b1, b2) {
 }
 
 export default function PinballGame({ onBack }) {
-  const [players, setPlayers] = useState([{ char: '🐢' }, { char: '🐇' }, { char: '🦊' }])
+  const [players, setPlayers] = useState([{ char: '🐮' }, { char: '🐷' }, { char: '🦊' }])
   const [ballCount, setBallCount] = useState(10)
   const [phase, setPhase] = useState('setup')
   const [loserIdx, setLoserIdx] = useState(null)
@@ -220,7 +220,7 @@ export default function PinballGame({ onBack }) {
     ctx.translate(0, -cameraY)
 
     // Full walls: straight section → funnel (connected path per side)
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)'
+    ctx.strokeStyle = 'rgba(255,255,255,0.60)'
     ctx.lineWidth = 3
     ctx.lineCap = 'round'
     ctx.beginPath()
@@ -257,7 +257,7 @@ export default function PinballGame({ onBack }) {
       if (peg.y + PEG_R < cameraY || peg.y - PEG_R > cameraY + canvasHRef.current) return
       ctx.beginPath()
       ctx.arc(peg.x, peg.y, PEG_R, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255,255,255,0.4)'
+      ctx.fillStyle = 'rgba(255,255,255,0.60)'
       ctx.fill()
     })
 
