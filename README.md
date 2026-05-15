@@ -1,16 +1,27 @@
-# React + Vite
+# 누가 쏠래 🎲
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+커피 한 잔, 누가 쏠지 정해주는 웹 게임 모음입니다.
 
-Currently, two official plugins are available:
+## 게임 목록
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **터치 추첨** — 화면에 손가락을 올리면 무작위로 한 명을 선택
+- **사다리 게임** — 사다리 타기로 꼴찌 결정
+- **꼴찌 정하기** — 캐릭터 경주로 마지막 도착자 선정
+- **핀볼** — 핀볼 물리 엔진으로 마지막 생존자 선정
 
-## React Compiler
+## 개발 환경
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+## 기술 스택
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React + Vite
+- Canvas 2D (물리 엔진 직접 구현)
+
+## 라이선스
+
+© 2026 ToasT1ng. 이 프로젝트는 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) 라이선스를 따릅니다.  
+비상업적 목적에 한해 자유롭게 사용·수정·배포할 수 있으며, **상업적 이용은 금지**됩니다.

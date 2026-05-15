@@ -24,6 +24,7 @@ export default function Home({ onSelect }) {
           </button>
         ))}
       </div>
+      <p className="home-copyright">© 2026 ToasT1ng · CC BY-NC 4.0 · 비상업적 이용만 허용</p>
     </div>
   )
 }
