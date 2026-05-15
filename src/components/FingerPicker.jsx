@@ -213,7 +213,7 @@ export default function FingerPicker({ onBack }) {
       >
         {phase === 'waiting' && touchCount === 0 && (
           <div className="finger-hint">
-            <div className="hint-icon">👆</div>
+            <div className="hint-icon">🖐️</div>
             <p>모두 손가락을 화면에 올려주세요</p>
             <p className="hint-sub">2명 이상이면 자동으로 시작</p>
           </div>
