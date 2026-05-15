@@ -1,17 +1,26 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import './FingerPicker.css'
 
-const COLORS = ['#e8623a','#4a9eff','#2ec87a','#f5a623','#c84aff','#ff4a8d','#00bcd4','#8bc34a']
-const HOLD_MS = 2000
+const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
+const HOLD_MS = 700
+const MOVE_THRESHOLD = 8
+
+function pickChar(currentTouches) {
+  const used = new Set(Object.values(currentTouches).map(t => t.char))
+  const available = CHARACTERS.filter(c => !used.has(c))
+  const pool = available.length > 0 ? available : CHARACTERS
+  return pool[Math.floor(Math.random() * pool.length)]
+}
 
 export default function FingerPicker({ onBack }) {
-  const [phase, setPhase] = useState('waiting') // waiting | countdown | result
-  const [touches, setTouches] = useState({})    // id -> {x,y,color,eliminated}
+  const [phase, setPhase] = useState('waiting')
+  const [touches, setTouches] = useState({})
   const [countdown, setCountdown] = useState(3)
   const [winner, setWinner] = useState(null)
   const holdTimer = useRef(null)
   const countdownTimer = useRef(null)
-  const colorIdx = useRef(0)
+  const mouseDownRef = useRef(false)
+  const lastPosRef = useRef({})
 
   const reset = () => {
     clearTimeout(holdTimer.current)
@@ -20,7 +29,6 @@ export default function FingerPicker({ onBack }) {
     setTouches({})
     setCountdown(3)
     setWinner(null)
-    colorIdx.current = 0
   }
 
   const startCountdown = useCallback((currentTouches) => {
@@ -56,17 +64,14 @@ export default function FingerPicker({ onBack }) {
     if (phase === 'countdown') setPhase('waiting')
 
     const rect = e.currentTarget.getBoundingClientRect()
-    const newTouches = { ...touches }
+    let newTouches = { ...touches }
 
     Array.from(e.changedTouches).forEach(t => {
       if (!newTouches[t.identifier]) {
-        newTouches[t.identifier] = {
-          x: t.clientX - rect.left,
-          y: t.clientY - rect.top,
-          color: COLORS[colorIdx.current % COLORS.length],
-          eliminated: false,
-        }
-        colorIdx.current += 1
+        const x = t.clientX - rect.left
+        const y = t.clientY - rect.top
+        newTouches[t.identifier] = { x, y, char: pickChar(newTouches), eliminated: false }
+        lastPosRef.current[t.identifier] = { x, y }
       }
     })
     setTouches(newTouches)
@@ -76,16 +81,111 @@ export default function FingerPicker({ onBack }) {
     }
   }, [phase, touches, startCountdown])
 
+  const handleTouchMove = useCallback((e) => {
+    e.preventDefault()
+    if (phase === 'result') return
+    const rect = e.currentTarget.getBoundingClientRect()
+    let moved = false
+    setTouches(prev => {
+      const next = { ...prev }
+      Array.from(e.changedTouches).forEach(t => {
+        if (!next[t.identifier]) return
+        const x = t.clientX - rect.left
+        const y = t.clientY - rect.top
+        const last = lastPosRef.current[t.identifier]
+        if (last) {
+          const dx = x - last.x, dy = y - last.y
+          if (Math.sqrt(dx * dx + dy * dy) >= MOVE_THRESHOLD) {
+            lastPosRef.current[t.identifier] = { x, y }
+            moved = true
+          }
+        }
+        next[t.identifier] = { ...next[t.identifier], x, y }
+      })
+      return next
+    })
+    if (moved && phase === 'waiting' && Object.keys(touches).length >= 2) {
+      clearTimeout(holdTimer.current)
+      holdTimer.current = setTimeout(() => startCountdown(touches), HOLD_MS)
+    }
+  }, [phase, touches, startCountdown])
+
   const handleTouchEnd = useCallback((e) => {
-    if (phase === 'result' || phase === 'countdown') return
+    if (phase === 'result') return
     e.preventDefault()
 
     clearTimeout(holdTimer.current)
+    clearInterval(countdownTimer.current)
+
     const newTouches = { ...touches }
     Array.from(e.changedTouches).forEach(t => {
       delete newTouches[t.identifier]
     })
     setTouches(newTouches)
+    if (phase === 'countdown') setPhase('waiting')
+  }, [phase, touches])
+
+  const handleMouseMove = useCallback((e) => {
+    if (!mouseDownRef.current || phase === 'result') return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const last = lastPosRef.current['mouse']
+    let moved = false
+    if (last) {
+      const dx = x - last.x, dy = y - last.y
+      if (Math.sqrt(dx * dx + dy * dy) >= MOVE_THRESHOLD) {
+        lastPosRef.current['mouse'] = { x, y }
+        moved = true
+      }
+    }
+    setTouches(prev => {
+      if (!prev['mouse']) return prev
+      return { ...prev, mouse: { ...prev['mouse'], x, y } }
+    })
+    if (moved && phase === 'waiting' && Object.keys(touches).length >= 2) {
+      clearTimeout(holdTimer.current)
+      holdTimer.current = setTimeout(() => startCountdown(touches), HOLD_MS)
+    }
+  }, [phase, touches, startCountdown])
+
+  // Mouse support for PC testing
+  const handleMouseDown = useCallback((e) => {
+    if (e.target.tagName === 'BUTTON') return
+    if (phase === 'result') return
+    mouseDownRef.current = true
+
+    clearTimeout(holdTimer.current)
+    clearInterval(countdownTimer.current)
+    if (phase === 'countdown') setPhase('waiting')
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const newTouches = { ...touches }
+    if (!newTouches['mouse']) {
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      newTouches['mouse'] = { x, y, char: pickChar(newTouches), eliminated: false }
+      lastPosRef.current['mouse'] = { x, y }
+    }
+    setTouches(newTouches)
+
+    if (Object.keys(newTouches).length >= 2) {
+      holdTimer.current = setTimeout(() => startCountdown(newTouches), HOLD_MS)
+    }
+  }, [phase, touches, startCountdown])
+
+  const handleMouseUp = useCallback((e) => {
+    mouseDownRef.current = false
+    if (e.target.tagName === 'BUTTON') return
+    if (phase === 'result') return
+
+    clearTimeout(holdTimer.current)
+    clearInterval(countdownTimer.current)
+
+    const newTouches = { ...touches }
+    delete newTouches['mouse']
+    setTouches(newTouches)
+    if (phase === 'countdown') setPhase('waiting')
   }, [phase, touches])
 
   useEffect(() => () => {
@@ -106,7 +206,10 @@ export default function FingerPicker({ onBack }) {
         className="finger-arena"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        onTouchMove={e => e.preventDefault()}
+        onTouchMove={handleTouchMove}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
       >
         {phase === 'waiting' && touchCount === 0 && (
           <div className="finger-hint">
@@ -122,6 +225,7 @@ export default function FingerPicker({ onBack }) {
             <p>한 명 더 올려주세요!</p>
           </div>
         )}
+
 
         {phase === 'countdown' && (
           <div className="countdown-overlay">
@@ -140,21 +244,13 @@ export default function FingerPicker({ onBack }) {
         {Object.entries(touches).map(([id, t]) => (
           <div
             key={id}
-            className={`touch-circle ${t.eliminated ? 'eliminated' : ''} ${phase === 'result' && !t.eliminated ? 'winner-circle' : ''}`}
-            style={{
-              left: t.x,
-              top: t.y,
-              background: t.color,
-            }}
-          />
+            className={`touch-char ${t.eliminated ? 'eliminated' : ''} ${phase === 'result' && !t.eliminated ? 'winner-char' : ''}`}
+            style={{ left: t.x, top: t.y }}
+          >
+            {t.char}
+          </div>
         ))}
       </div>
-
-      {phase === 'waiting' && touchCount >= 2 && (
-        <div className="finger-status">
-          {touchCount}명 대기 중 — 손 떼지 마세요!
-        </div>
-      )}
     </div>
   )
 }
