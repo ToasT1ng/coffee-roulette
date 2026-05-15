@@ -21,6 +21,7 @@
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 16px;
   max-width: 420px;
   width: 100%;
@@ -43,20 +44,20 @@
 .race-player-card {
   position: relative;
   background: #f0ebe1;
-  border-radius: 14px;
-  padding: 10px 12px;
+  border-radius: 18px;
+  padding: 14px 16px;
   width: 100%;
 }
 
 .remove-btn {
   position: absolute;
-  top: -7px;
-  right: -7px;
+  top: -9px;
+  right: -9px;
   background: #c8a882;
   color: #fff;
-  font-size: 11px;
-  width: 20px;
-  height: 20px;
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -67,18 +68,19 @@
 
 .char-picker {
   display: flex;
-  flex-wrap: wrap;
   gap: 5px;
   width: 100%;
 }
 
 .char-btn {
-  background: #f5f0e8;
-  border-radius: 8px;
-  padding: 4px 6px;
-  font-size: 20px;
-  border: 2px solid transparent;
+  flex: 1;
+  background: #fefcf8;
+  border-radius: 12px;
+  padding: 5px 0;
+  font-size: 22px;
+  border: 2.5px solid transparent;
   transition: border-color 0.1s;
+  text-align: center;
 }
 
 .char-btn.selected {
@@ -94,11 +96,11 @@
 .add-btn {
   width: 100%;
   background: none;
-  border: 1.5px dashed #c8a882;
+  border: 2px dashed #c8a882;
   color: #9a7558;
-  border-radius: 12px;
-  padding: 10px;
-  font-size: 15px;
+  border-radius: 16px;
+  padding: 14px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -106,9 +108,9 @@
   width: 100%;
   background: #1a1a2e;
   color: #fff;
-  border-radius: 16px;
-  padding: 16px;
-  font-size: 17px;
+  border-radius: 18px;
+  padding: 18px;
+  font-size: 18px;
   font-weight: 700;
   margin-top: 4px;
 }
