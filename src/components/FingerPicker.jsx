@@ -3,6 +3,7 @@ import './FingerPicker.css'
 
 const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
 const HOLD_MS = 700
+const MOVE_THRESHOLD = 8
 
 function pickChar(currentTouches) {
   const used = new Set(Object.values(currentTouches).map(t => t.char))
@@ -19,6 +20,7 @@ export default function FingerPicker({ onBack }) {
   const holdTimer = useRef(null)
   const countdownTimer = useRef(null)
   const mouseDownRef = useRef(false)
+  const lastPosRef = useRef({})
 
   const reset = () => {
     clearTimeout(holdTimer.current)
@@ -66,12 +68,10 @@ export default function FingerPicker({ onBack }) {
 
     Array.from(e.changedTouches).forEach(t => {
       if (!newTouches[t.identifier]) {
-        newTouches[t.identifier] = {
-          x: t.clientX - rect.left,
-          y: t.clientY - rect.top,
-          char: pickChar(newTouches),
-          eliminated: false,
-        }
+        const x = t.clientX - rect.left
+        const y = t.clientY - rect.top
+        newTouches[t.identifier] = { x, y, char: pickChar(newTouches), eliminated: false }
+        lastPosRef.current[t.identifier] = { x, y }
       }
     })
     setTouches(newTouches)
@@ -85,20 +85,26 @@ export default function FingerPicker({ onBack }) {
     e.preventDefault()
     if (phase === 'result') return
     const rect = e.currentTarget.getBoundingClientRect()
+    let moved = false
     setTouches(prev => {
       const next = { ...prev }
       Array.from(e.changedTouches).forEach(t => {
-        if (next[t.identifier]) {
-          next[t.identifier] = {
-            ...next[t.identifier],
-            x: t.clientX - rect.left,
-            y: t.clientY - rect.top,
+        if (!next[t.identifier]) return
+        const x = t.clientX - rect.left
+        const y = t.clientY - rect.top
+        const last = lastPosRef.current[t.identifier]
+        if (last) {
+          const dx = x - last.x, dy = y - last.y
+          if (Math.sqrt(dx * dx + dy * dy) >= MOVE_THRESHOLD) {
+            lastPosRef.current[t.identifier] = { x, y }
+            moved = true
           }
         }
+        next[t.identifier] = { ...next[t.identifier], x, y }
       })
       return next
     })
-    if (phase === 'waiting' && Object.keys(touches).length >= 2) {
+    if (moved && phase === 'waiting' && Object.keys(touches).length >= 2) {
       clearTimeout(holdTimer.current)
       holdTimer.current = setTimeout(() => startCountdown(touches), HOLD_MS)
     }
@@ -122,14 +128,22 @@ export default function FingerPicker({ onBack }) {
   const handleMouseMove = useCallback((e) => {
     if (!mouseDownRef.current || phase === 'result') return
     const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const last = lastPosRef.current['mouse']
+    let moved = false
+    if (last) {
+      const dx = x - last.x, dy = y - last.y
+      if (Math.sqrt(dx * dx + dy * dy) >= MOVE_THRESHOLD) {
+        lastPosRef.current['mouse'] = { x, y }
+        moved = true
+      }
+    }
     setTouches(prev => {
       if (!prev['mouse']) return prev
-      return {
-        ...prev,
-        mouse: { ...prev['mouse'], x: e.clientX - rect.left, y: e.clientY - rect.top },
-      }
+      return { ...prev, mouse: { ...prev['mouse'], x, y } }
     })
-    if (phase === 'waiting' && Object.keys(touches).length >= 2) {
+    if (moved && phase === 'waiting' && Object.keys(touches).length >= 2) {
       clearTimeout(holdTimer.current)
       holdTimer.current = setTimeout(() => startCountdown(touches), HOLD_MS)
     }
@@ -148,12 +162,10 @@ export default function FingerPicker({ onBack }) {
     const rect = e.currentTarget.getBoundingClientRect()
     const newTouches = { ...touches }
     if (!newTouches['mouse']) {
-      newTouches['mouse'] = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        char: pickChar(newTouches),
-        eliminated: false,
-      }
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      newTouches['mouse'] = { x, y, char: pickChar(newTouches), eliminated: false }
+      lastPosRef.current['mouse'] = { x, y }
     }
     setTouches(newTouches)
 
