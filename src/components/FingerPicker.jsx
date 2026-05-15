@@ -18,6 +18,7 @@ export default function FingerPicker({ onBack }) {
   const [winner, setWinner] = useState(null)
   const holdTimer = useRef(null)
   const countdownTimer = useRef(null)
+  const mouseDownRef = useRef(false)
 
   const reset = () => {
     clearTimeout(holdTimer.current)
@@ -80,6 +81,25 @@ export default function FingerPicker({ onBack }) {
     }
   }, [phase, touches, startCountdown])
 
+  const handleTouchMove = useCallback((e) => {
+    e.preventDefault()
+    if (phase === 'result') return
+    const rect = e.currentTarget.getBoundingClientRect()
+    setTouches(prev => {
+      const next = { ...prev }
+      Array.from(e.changedTouches).forEach(t => {
+        if (next[t.identifier]) {
+          next[t.identifier] = {
+            ...next[t.identifier],
+            x: t.clientX - rect.left,
+            y: t.clientY - rect.top,
+          }
+        }
+      })
+      return next
+    })
+  }, [phase])
+
   const handleTouchEnd = useCallback((e) => {
     if (phase === 'result' || phase === 'countdown') return
     e.preventDefault()
@@ -92,10 +112,23 @@ export default function FingerPicker({ onBack }) {
     setTouches(newTouches)
   }, [phase, touches])
 
+  const handleMouseMove = useCallback((e) => {
+    if (!mouseDownRef.current || phase === 'result') return
+    const rect = e.currentTarget.getBoundingClientRect()
+    setTouches(prev => {
+      if (!prev['mouse']) return prev
+      return {
+        ...prev,
+        mouse: { ...prev['mouse'], x: e.clientX - rect.left, y: e.clientY - rect.top },
+      }
+    })
+  }, [phase])
+
   // Mouse support for PC testing
   const handleMouseDown = useCallback((e) => {
     if (e.target.tagName === 'BUTTON') return
     if (phase === 'result') return
+    mouseDownRef.current = true
 
     clearTimeout(holdTimer.current)
     clearInterval(countdownTimer.current)
@@ -119,6 +152,7 @@ export default function FingerPicker({ onBack }) {
   }, [phase, touches, startCountdown])
 
   const handleMouseUp = useCallback((e) => {
+    mouseDownRef.current = false
     if (e.target.tagName === 'BUTTON') return
     if (phase === 'result' || phase === 'countdown') return
 
@@ -146,9 +180,10 @@ export default function FingerPicker({ onBack }) {
         className="finger-arena"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        onTouchMove={e => e.preventDefault()}
+        onTouchMove={handleTouchMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
       >
         {phase === 'waiting' && touchCount === 0 && (
           <div className="finger-hint">
