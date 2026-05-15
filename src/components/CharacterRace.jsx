@@ -4,18 +4,24 @@ import './CharacterRace.css'
 const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨']
 const COLORS = ['#e8623a','#4a9eff','#2ec87a','#f5a623','#c84aff','#ff4a8d']
 const MAX_PLAYERS = 6
+const BASE_SPEED = 0.00022
+const BOOST_CHANCE = 0.01
+const BOOST_STRENGTH = 0.003
+const BOOST_DURATION = 35
+const DRAMA_ZONE = 0.80
+
+const RANK_LABELS = ['1등 👑','2등','3등','4등','5등','꼴찌 ☕']
 
 export default function CharacterRace({ onBack }) {
   const [players, setPlayers] = useState([
     { name: '', char: '🐢' },
     { name: '', char: '🐇' },
   ])
-  const [phase, setPhase] = useState('setup') // setup | racing | done
-  const [winner, setWinner] = useState(null)
+  const [phase, setPhase] = useState('setup')
+  const [loser, setLoser] = useState(null)
   const canvasRef = useRef()
   const animRef = useRef()
-  const posRef = useRef([])
-  const speedRef = useRef([])
+  const stateRef = useRef([])
 
   const n = players.length
 
@@ -36,48 +42,53 @@ export default function CharacterRace({ onBack }) {
   }
 
   function startRace() {
-    posRef.current = players.map(() => 0)
-    speedRef.current = players.map(() => 0)
-    setWinner(null)
+    stateRef.current = players.map(() => ({
+      pos: 0,
+      speed: BASE_SPEED,
+      boost: 0,
+      rank: null,   // null = still racing, number = finish rank (1-based)
+    }))
+    setLoser(null)
     setPhase('racing')
   }
 
-  const draw = useCallback(() => {
+  const draw = useCallback((states) => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     const W = canvas.width
     const H = canvas.height
-    const TRACK_H = H / n
-    const FINISH = W - 50
+    const TRACK_H = H / players.length
+    const FINISH_X = W - 52
 
     ctx.clearRect(0, 0, W, H)
-
-    // background
     ctx.fillStyle = '#1a1a2e'
     ctx.fillRect(0, 0, W, H)
 
-    // finish line
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)'
-    ctx.lineWidth = 2
-    ctx.setLineDash([6, 4])
-    ctx.beginPath()
-    ctx.moveTo(FINISH, 0)
-    ctx.lineTo(FINISH, H)
-    ctx.stroke()
-    ctx.setLineDash([])
+    // checkered finish line
+    const sq = 9
+    for (let row = 0; row < Math.ceil(H / sq); row++) {
+      for (let col = 0; col < 2; col++) {
+        if ((row + col) % 2 === 0) {
+          ctx.fillStyle = 'rgba(255,255,255,0.22)'
+          ctx.fillRect(FINISH_X + col * sq, row * sq, sq, sq)
+        }
+      }
+    }
     ctx.fillStyle = 'rgba(255,255,255,0.5)'
-    ctx.font = '11px system-ui'
+    ctx.font = 'bold 9px system-ui'
     ctx.textAlign = 'center'
-    ctx.fillText('FINISH', FINISH, 14)
+    ctx.fillText('FINISH', FINISH_X + sq, 10)
 
     players.forEach((pl, i) => {
+      const st = states[i]
       const trackY = i * TRACK_H
       const centerY = trackY + TRACK_H / 2
+      const charX = 58 + st.pos * (FINISH_X - 62)
 
-      // lane separator
+      // lane
       if (i > 0) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)'
         ctx.lineWidth = 1
         ctx.setLineDash([])
         ctx.beginPath()
@@ -86,42 +97,82 @@ export default function CharacterRace({ onBack }) {
         ctx.stroke()
       }
 
+      // boost flame
+      if (st.boost > 0) {
+        ctx.font = `${TRACK_H * 0.32}px serif`
+        ctx.textAlign = 'center'
+        ctx.fillText('🔥', charX - TRACK_H * 0.5, centerY + TRACK_H * 0.18)
+      }
+
+      // character (dim if finished)
+      ctx.globalAlpha = st.rank !== null ? 0.55 : 1.0
+      ctx.font = `${TRACK_H * 0.58}px serif`
+      ctx.textAlign = 'center'
+      ctx.fillText(pl.char, charX, centerY + TRACK_H * 0.22)
+      ctx.globalAlpha = 1.0
+
       // name label
       ctx.fillStyle = COLORS[i]
-      ctx.font = 'bold 12px system-ui'
+      ctx.font = 'bold 11px system-ui'
       ctx.textAlign = 'left'
-      ctx.fillText(pl.name || `P${i+1}`, 8, centerY + 4)
+      ctx.fillText(pl.name || `P${i+1}`, 4, centerY + 4)
 
-      // character
-      const x = 60 + posRef.current[i] * (FINISH - 60)
-      ctx.font = `${TRACK_H * 0.6}px serif`
-      ctx.textAlign = 'center'
-      ctx.fillText(pl.char, x, centerY + TRACK_H * 0.22)
+      // rank badge when finished
+      if (st.rank !== null) {
+        const totalPlayers = players.length
+        const rankLabel = st.rank === 1 ? '👑' : st.rank === totalPlayers ? '☕' : `${st.rank}등`
+        ctx.font = `bold 12px system-ui`
+        ctx.fillStyle = st.rank === totalPlayers ? '#e8623a' : st.rank === 1 ? '#f5a623' : 'rgba(255,255,255,0.6)'
+        ctx.textAlign = 'center'
+        ctx.fillText(rankLabel, charX, centerY - TRACK_H * 0.28)
+      }
     })
   }, [players])
 
   useEffect(() => {
     if (phase !== 'racing') return
-
     let done = false
+    let finishCount = 0
 
     function tick() {
       if (done) return
-      const FINISH_THRESHOLD = 1.0
+      const states = stateRef.current
+      const racing = states.filter(s => s.rank === null)
+      const leader = Math.max(...racing.map(s => s.pos), 0)
 
-      players.forEach((_, i) => {
-        const baseSpeed = 0.002 + Math.random() * 0.006
-        const surge = Math.random() < 0.03 ? 0.015 : 0
-        speedRef.current[i] = baseSpeed + surge
-        posRef.current[i] = Math.min(posRef.current[i] + speedRef.current[i], FINISH_THRESHOLD)
+      states.forEach((st) => {
+        if (st.rank !== null) return // already finished
+
+        if (st.boost <= 0 && Math.random() < BOOST_CHANCE) {
+          st.boost = BOOST_DURATION
+        }
+        const isBoost = st.boost > 0
+        if (isBoost) st.boost--
+
+        const dramaFactor = leader > DRAMA_ZONE
+          ? 0.5 + Math.random() * 0.35
+          : 1.0
+
+        const gap = leader - st.pos
+        const catchUp = gap > 0.18 ? 1.25 : 1.0
+
+        const noise = (Math.random() - 0.3) * 0.0015
+        st.speed = (BASE_SPEED + noise + (isBoost ? BOOST_STRENGTH : 0)) * dramaFactor * catchUp
+        st.speed = Math.max(0.0003, st.speed)
+        st.pos = Math.min(st.pos + st.speed, 1.0)
+
+        if (st.pos >= 1.0) {
+          finishCount++
+          st.rank = finishCount
+        }
       })
 
-      draw()
+      draw(states)
 
-      const finishedIdx = posRef.current.findIndex(p => p >= FINISH_THRESHOLD)
-      if (finishedIdx !== -1) {
+      if (finishCount >= players.length) {
         done = true
-        setWinner(finishedIdx)
+        const loserIdx = states.findIndex(s => s.rank === players.length)
+        setLoser(loserIdx)
         setPhase('done')
         return
       }
@@ -130,20 +181,13 @@ export default function CharacterRace({ onBack }) {
     }
 
     animRef.current = requestAnimationFrame(tick)
-    return () => {
-      done = true
-      cancelAnimationFrame(animRef.current)
-    }
+    return () => { done = true; cancelAnimationFrame(animRef.current) }
   }, [phase, draw, players])
-
-  useEffect(() => {
-    if (phase === 'done') draw()
-  }, [phase, draw])
 
   function reset() {
     cancelAnimationFrame(animRef.current)
     setPhase('setup')
-    setWinner(null)
+    setLoser(null)
   }
 
   return (
@@ -195,14 +239,14 @@ export default function CharacterRace({ onBack }) {
             ref={canvasRef}
             className="race-canvas"
             width={360}
-            height={Math.max(240, n * 72)}
+            height={Math.max(240, n * 76)}
           />
-          {phase === 'done' && winner !== null && (
+          {phase === 'done' && loser !== null && (
             <div className="race-result">
-              <div className="race-winner-icon">{players[winner].char}</div>
+              <div className="race-winner-icon">{players[loser].char}</div>
               <div className="race-winner-text">
-                {players[winner].name || `P${winner + 1}`} 1등!<br />
-                <span className="race-loser-text">꼴찌가 커피 쏩니다 ☕</span>
+                {players[loser].name || `P${loser + 1}`} 꼴찌!<br />
+                <span className="race-loser-text">커피 쏘세요 ☕</span>
               </div>
               <button className="start-btn" onClick={reset}>다시하기</button>
             </div>
