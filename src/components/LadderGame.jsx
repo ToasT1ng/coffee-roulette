@@ -182,15 +182,14 @@ export default function LadderGame({ onBack }) {
     })
   }, [ladder, results, coffeeCol, players, n])
 
-  function revealAll() {
-    progressRef.current = 0
-    setPhase('animating')
-  }
-
   useEffect(() => {
-    if (phase === 'playing') {
-      draw(0)
-    }
+    if (phase !== 'playing') return
+    draw(0)
+    const timer = setTimeout(() => {
+      progressRef.current = 0
+      setPhase('animating')
+    }, 750)
+    return () => clearTimeout(timer)
   }, [phase, draw])
 
   useEffect(() => {
@@ -262,9 +261,7 @@ export default function LadderGame({ onBack }) {
       {(phase === 'playing' || phase === 'animating' || phase === 'done') && (
         <div className="ladder-play">
           <canvas ref={canvasRef} className="ladder-canvas" width={360} height={500} />
-          {phase === 'playing' && (
-            <button className="reveal-btn" onClick={revealAll}>출발!</button>
-          )}
+
           {phase === 'done' && loser !== null && loser >= 0 && (
             <div className="ladder-overlay" onClick={reset}>
               <div className="ladder-verdict">
