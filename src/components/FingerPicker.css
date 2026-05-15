@@ -64,37 +64,36 @@
   color: rgba(255,255,255,0.4) !important;
 }
 
-.touch-circle {
+.touch-char {
   position: absolute;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  font-size: 80px;
+  line-height: 1;
   transform: translate(-50%, -50%);
   transition: opacity 0.3s, transform 0.3s;
-  box-shadow: 0 0 0 6px rgba(255,255,255,0.15);
   animation: pop-in 0.15s ease-out;
+  pointer-events: none;
+  user-select: none;
 }
 
 @keyframes pop-in {
-  from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  from { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
   to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-.touch-circle.eliminated {
+.touch-char.eliminated {
   opacity: 0.15;
-  transform: translate(-50%, -50%) scale(0.6);
+  transform: translate(-50%, -50%) scale(0.5);
 }
 
-.touch-circle.winner-circle {
-  box-shadow: 0 0 0 8px rgba(255,255,255,0.5), 0 0 40px currentColor;
+.touch-char.winner-char {
+  font-size: 96px;
   animation: winner-pulse 0.6s ease-in-out infinite alternate;
-  width: 100px;
-  height: 100px;
+  filter: drop-shadow(0 0 16px rgba(255,255,255,0.8));
 }
 
 @keyframes winner-pulse {
-  from { box-shadow: 0 0 0 8px rgba(255,255,255,0.4), 0 0 20px rgba(255,255,255,0.3); }
-  to { box-shadow: 0 0 0 14px rgba(255,255,255,0.2), 0 0 50px rgba(255,255,255,0.5); }
+  from { filter: drop-shadow(0 0 8px rgba(255,255,255,0.5)); transform: translate(-50%, -50%) scale(1); }
+  to { filter: drop-shadow(0 0 24px rgba(255,255,255,0.9)); transform: translate(-50%, -50%) scale(1.15); }
 }
 
 .countdown-overlay {
@@ -157,10 +156,14 @@
   border-radius: 50px;
 }
 
-.finger-status {
-  background: #16213e;
+.finger-status-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: rgba(255,255,255,0.7);
-  text-align: center;
-  padding: 12px;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  pointer-events: none;
 }
