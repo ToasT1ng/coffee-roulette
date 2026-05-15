@@ -19,6 +19,7 @@ export default function CharacterRace({ onBack }) {
   const canvasRef = useRef()
   const animRef = useRef()
   const stateRef = useRef([])
+  const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1
 
   const n = players.length
 
@@ -51,8 +52,9 @@ export default function CharacterRace({ onBack }) {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    const W = canvas.width
-    const H = canvas.height
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    const W = canvas.width / dpr
+    const H = canvas.height / dpr
     const TRACK_H = H / players.length
     const MARGIN = 44
     const FINISH_X = W - MARGIN  // 316px, right margin = 44px
@@ -216,8 +218,9 @@ export default function CharacterRace({ onBack }) {
           <canvas
             ref={canvasRef}
             className="race-canvas"
-            width={360}
-            height={Math.max(240, n * 76)}
+            width={360 * dpr}
+            height={Math.max(240, n * 76) * dpr}
+            style={{ width: 360, height: Math.max(240, n * 76) }}
           />
           {phase === 'done' && loser !== null && (
             <div className="race-overlay" onClick={reset}>

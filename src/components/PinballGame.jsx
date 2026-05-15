@@ -151,6 +151,7 @@ export default function PinballGame({ onBack }) {
   const playRef = useRef()
   const canvasHRef = useRef(H)
   const [canvasH, setCanvasH] = useState(H)
+  const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1
   const animRef = useRef()
   const ballsRef = useRef([])
   const cameraRef = useRef(0)
@@ -211,7 +212,9 @@ export default function PinballGame({ onBack }) {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, W, canvasHRef.current)
+    const cH = canvasHRef.current
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.clearRect(0, 0, W, cH)
 
     ctx.save()
     ctx.translate(0, -cameraY)
@@ -461,7 +464,13 @@ export default function PinballGame({ onBack }) {
 
       {(phase === 'playing' || phase === 'panning' || phase === 'done') && (
         <div className="pinball-play" ref={playRef}>
-          <canvas ref={canvasRef} className="pinball-canvas" width={W} height={canvasH} />
+          <canvas
+            ref={canvasRef}
+            className="pinball-canvas"
+            width={W * dpr}
+            height={canvasH * dpr}
+            style={{ width: W, height: canvasH }}
+          />
           {phase !== 'done' && Object.keys(aliveCounts).length > 0 && (
             <div className="pinball-counts">
               {players.map((p, i) => (
