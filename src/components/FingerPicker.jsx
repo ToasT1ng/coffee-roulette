@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import './FingerPicker.css'
 
-const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
+const CHARACTERS = ['🐮','🐷','🦊','🐻','🐼','🐨','🐱','🐶']
 const HOLD_MS = 700
 const MOVE_THRESHOLD = 8
 

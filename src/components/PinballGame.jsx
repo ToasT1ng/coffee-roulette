@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react'
 import './PinballGame.css'
 
-const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
+const CHARACTERS = ['🐮','🐷','🦊','🐻','🐼','🐨','🐱','🐶']
 const MAX_PLAYERS = 8
 const GRAVITY = 0.178
 const DAMPING = 0.62
@@ -23,7 +23,7 @@ const PADDLES = [
 ]
 
 const CHAR_RADIUS = {
-  '🐢': 12, '🐇': 12, '🦊': 12, '🐻': 12,
+  '🐮': 12, '🐷': 12, '🦊': 12, '🐻': 12,
   '🐼': 12, '🐨': 12, '🐱': 12, '🐶': 12,
 }
 
@@ -142,7 +142,7 @@ function resolveBallPair(b1, b2) {
 }
 
 export default function PinballGame({ onBack }) {
-  const [players, setPlayers] = useState([{ char: '🐢' }, { char: '🐇' }, { char: '🦊' }])
+  const [players, setPlayers] = useState([{ char: '🐮' }, { char: '🐷' }, { char: '🦊' }])
   const [ballCount, setBallCount] = useState(10)
   const [phase, setPhase] = useState('setup')
   const [loserIdx, setLoserIdx] = useState(null)
