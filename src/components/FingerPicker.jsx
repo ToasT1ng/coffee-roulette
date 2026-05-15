@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import './FingerPicker.css'
 
 const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
-const HOLD_MS = 2000
+const HOLD_MS = 700
 
 function pickChar(currentTouches) {
   const used = new Set(Object.values(currentTouches).map(t => t.char))
@@ -98,7 +98,11 @@ export default function FingerPicker({ onBack }) {
       })
       return next
     })
-  }, [phase])
+    if (phase === 'waiting' && Object.keys(touches).length >= 2) {
+      clearTimeout(holdTimer.current)
+      holdTimer.current = setTimeout(() => startCountdown(touches), HOLD_MS)
+    }
+  }, [phase, touches, startCountdown])
 
   const handleTouchEnd = useCallback((e) => {
     if (phase === 'result') return
@@ -125,7 +129,11 @@ export default function FingerPicker({ onBack }) {
         mouse: { ...prev['mouse'], x: e.clientX - rect.left, y: e.clientY - rect.top },
       }
     })
-  }, [phase])
+    if (phase === 'waiting' && Object.keys(touches).length >= 2) {
+      clearTimeout(holdTimer.current)
+      holdTimer.current = setTimeout(() => startCountdown(touches), HOLD_MS)
+    }
+  }, [phase, touches, startCountdown])
 
   // Mouse support for PC testing
   const handleMouseDown = useCallback((e) => {
@@ -206,11 +214,6 @@ export default function FingerPicker({ onBack }) {
           </div>
         )}
 
-        {phase === 'waiting' && touchCount >= 2 && (
-          <div className="finger-status-overlay">
-            {touchCount}명 대기 중 — 손 떼지 마세요!
-          </div>
-        )}
 
         {phase === 'countdown' && (
           <div className="countdown-overlay">
