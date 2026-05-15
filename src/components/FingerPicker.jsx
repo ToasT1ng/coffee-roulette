@@ -123,7 +123,11 @@ export default function FingerPicker({ onBack }) {
     })
     setTouches(newTouches)
     if (phase === 'countdown') setPhase('waiting')
-  }, [phase, touches])
+
+    if (Object.keys(newTouches).length >= 2) {
+      holdTimer.current = setTimeout(() => startCountdown(newTouches), HOLD_MS)
+    }
+  }, [phase, touches, startCountdown])
 
   const handleMouseMove = useCallback((e) => {
     if (!mouseDownRef.current || phase === 'result') return
