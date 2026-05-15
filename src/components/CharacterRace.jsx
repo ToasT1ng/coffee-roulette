@@ -177,7 +177,7 @@ export default function CharacterRace({ onBack }) {
     <div className="race-root">
       <div className="race-header">
         <button className="back-btn" onClick={onBack}>‹</button>
-        <span>캐릭터 경주</span>
+        <span>꼴찌 정하기</span>
       </div>
 
       {phase === 'setup' && (

@@ -1,14 +1,15 @@
 .home {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   height: 100%;
   padding: 0 20px;
+  gap: 32px;
   background: linear-gradient(160deg, #f5f0e8 0%, #ede4d4 100%);
 }
 
 .home-header {
   text-align: center;
-  padding: 48px 0 32px;
 }
 
 .home-logo {

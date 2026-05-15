@@ -99,7 +99,7 @@ export default function FingerPicker({ onBack }) {
     <div className="finger-root">
       <div className="finger-header">
         <button className="back-btn" onClick={onBack}>‹</button>
-        <span>손가락 뽑기</span>
+        <span>터치 추첨</span>
       </div>
 
       <div
