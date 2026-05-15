@@ -1,0 +1,81 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 20px;
+  background: linear-gradient(160deg, #f5f0e8 0%, #ede4d4 100%);
+}
+
+.home-header {
+  text-align: center;
+  padding: 48px 0 32px;
+}
+
+.home-logo {
+  font-size: 64px;
+  margin-bottom: 8px;
+}
+
+.home-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #3b2314;
+  letter-spacing: -1px;
+}
+
+.home-header p {
+  font-size: 15px;
+  color: #9a7558;
+  margin-top: 4px;
+}
+
+.home-games {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.game-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fefcf8;
+  border-radius: 20px;
+  padding: 20px 20px;
+  box-shadow: 0 2px 16px rgba(111,78,55,0.10);
+  transition: transform 0.12s, box-shadow 0.12s;
+  text-align: left;
+  border: 1.5px solid rgba(200,168,130,0.3);
+}
+
+.game-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 6px rgba(111,78,55,0.08);
+}
+
+.game-emoji {
+  font-size: 36px;
+  flex-shrink: 0;
+}
+
+.game-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #3b2314;
+}
+
+.game-desc {
+  font-size: 13px;
+  color: #9a7558;
+  margin-top: 2px;
+}
+
+.game-arrow {
+  margin-left: auto;
+  font-size: 24px;
+  color: #c8a882;
+  font-weight: 300;
+}
