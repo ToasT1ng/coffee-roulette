@@ -220,13 +220,13 @@ export default function CharacterRace({ onBack }) {
             height={Math.max(240, n * 76)}
           />
           {phase === 'done' && loser !== null && (
-            <div className="race-result">
-              <div className="race-winner-icon">{players[loser].char}</div>
-              <div className="race-winner-text">
-                꼴찌!<br />
-                <span className="race-loser-text">커피 쏘세요 ☕</span>
+            <div className="race-overlay" onClick={reset}>
+              <div className="race-verdict">
+                <span className="verdict-char">{players[loser].char}</span>
+                <span className="verdict-badge">☕</span>
               </div>
-              <button className="start-btn" onClick={reset}>다시하기</button>
+              <p className="verdict-text">커피 쏘세요!</p>
+              <p className="verdict-sub">탭해서 다시하기</p>
             </div>
           )}
         </div>
