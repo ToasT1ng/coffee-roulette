@@ -186,7 +186,7 @@ export default function LadderGame({ onBack }) {
     <div className="ladder-root">
       <div className="ladder-header">
         <button className="back-btn" onClick={onBack}>‹</button>
-        <span>사다리타기</span>
+        <span>사다리 게임</span>
       </div>
 
       {phase === 'setup' && (
