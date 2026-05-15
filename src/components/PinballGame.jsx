@@ -220,7 +220,7 @@ export default function PinballGame({ onBack }) {
     ctx.translate(0, -cameraY)
 
     // Full walls: straight section → funnel (connected path per side)
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)'
+    ctx.strokeStyle = 'rgba(255,255,255,0.60)'
     ctx.lineWidth = 3
     ctx.lineCap = 'round'
     ctx.beginPath()
@@ -257,7 +257,7 @@ export default function PinballGame({ onBack }) {
       if (peg.y + PEG_R < cameraY || peg.y - PEG_R > cameraY + canvasHRef.current) return
       ctx.beginPath()
       ctx.arc(peg.x, peg.y, PEG_R, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255,255,255,0.55)'
+      ctx.fillStyle = 'rgba(255,255,255,0.60)'
       ctx.fill()
     })
 
