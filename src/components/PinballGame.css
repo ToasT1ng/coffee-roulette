@@ -78,7 +78,7 @@
   border-radius: 12px;
   padding: 5px 0;
   font-size: 26px;
-  border: 2.5px solid transparent;
+  border: 1px solid transparent;
   transition: border-color 0.1s;
   text-align: center;
 }
