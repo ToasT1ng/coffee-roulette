@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react'
 import './PinballGame.css'
 
 const CHARACTERS = ['🐢','🐇','🦊','🐻','🐼','🐨','🐱','🐶']
@@ -148,11 +148,27 @@ export default function PinballGame({ onBack }) {
   const [loserIdx, setLoserIdx] = useState(null)
   const [aliveCounts, setAliveCounts] = useState({})
   const canvasRef = useRef()
+  const playRef = useRef()
+  const canvasHRef = useRef(H)
+  const [canvasH, setCanvasH] = useState(H)
   const animRef = useRef()
   const ballsRef = useRef([])
   const cameraRef = useRef(0)
   const paddleAnglesRef = useRef(PADDLES.map((_, i) => i * Math.PI / 2))
   const survivorRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const el = playRef.current
+    if (!el) return
+    const update = () => {
+      const h = el.clientHeight
+      if (h > 0) { canvasHRef.current = h; setCanvasH(h) }
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   function addPlayer() {
     if (players.length < MAX_PLAYERS) {
@@ -195,7 +211,7 @@ export default function PinballGame({ onBack }) {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, W, H)
+    ctx.clearRect(0, 0, W, canvasHRef.current)
 
     ctx.save()
     ctx.translate(0, -cameraY)
@@ -235,7 +251,7 @@ export default function PinballGame({ onBack }) {
 
     // Pegs within visible viewport
     PEGS.forEach(peg => {
-      if (peg.y + PEG_R < cameraY || peg.y - PEG_R > cameraY + H) return
+      if (peg.y + PEG_R < cameraY || peg.y - PEG_R > cameraY + canvasHRef.current) return
       ctx.beginPath()
       ctx.arc(peg.x, peg.y, PEG_R, 0, Math.PI * 2)
       ctx.fillStyle = 'rgba(255,255,255,0.4)'
@@ -341,9 +357,10 @@ export default function PinballGame({ onBack }) {
       // Camera follows leading ball but stops once end line reaches bottom 25%
       if (alive.length > 0) {
         const lowestY = Math.max(...alive.map(b => b.y))
+        const cH = canvasHRef.current
         const targetCamera = Math.min(
-          Math.max(0, lowestY - H * 0.45),
-          H_WORLD - H * 0.85
+          Math.max(0, lowestY - cH * 0.45),
+          H_WORLD - cH * 0.85
         )
         cameraRef.current += (targetCamera - cameraRef.current) * 0.06
       }
@@ -371,7 +388,7 @@ export default function PinballGame({ onBack }) {
     const survivor = survivorRef.current
     if (!survivor) { setPhase('done'); return }
     const startCamera = cameraRef.current
-    const targetCamera = Math.max(0, survivor.y - H * 0.45)
+    const targetCamera = Math.max(0, survivor.y - canvasHRef.current * 0.45)
     const startTime = Date.now()
     const DURATION = 800
 
@@ -443,8 +460,8 @@ export default function PinballGame({ onBack }) {
       )}
 
       {(phase === 'playing' || phase === 'panning' || phase === 'done') && (
-        <div className="pinball-play">
-          <canvas ref={canvasRef} className="pinball-canvas" width={W} height={H} />
+        <div className="pinball-play" ref={playRef}>
+          <canvas ref={canvasRef} className="pinball-canvas" width={W} height={canvasH} />
           {phase !== 'done' && Object.keys(aliveCounts).length > 0 && (
             <div className="pinball-counts">
               {players.map((p, i) => (
